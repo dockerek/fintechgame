@@ -4,7 +4,7 @@ import math
 import uuid
 
 
-app = Flask(__namebạn giải thi__)
+app = Flask(__name__)
 app.secret_key = 'startup-game-secret'
 
 
