@@ -6,7 +6,7 @@ import uuid
 app = Flask(__name__)
 app.secret_key = 'startup-game-secret'
 
-# ===================== DỮ LIỆU CỐ ĐỊNH (GIỮ NGUYÊN BẢN GỐC) =====================
+# ===================== DỮ LIỆU CỐ ĐỊNH =====================
 SCENARIOS = [
     {"id":1,"name":"Tin tốt nhẹ","cat":"Market","delta":{"price":0.05,"cogs":0,"hype":10,"sentiment":5,"transparency":0,"reg_risk":0}},
     {"id":2,"name":"Tin tốt vừa","cat":"Market","delta":{"price":0.1,"cogs":-0.05,"hype":20,"sentiment":10,"transparency":0,"reg_risk":0}},
@@ -167,7 +167,7 @@ def calculate_metrics(proj):
         "runway":runway, "liquidity":liquidity, "funding_progress":proj.get("funding_progress",0)
     }
 
-def attractiveness(project, bot, metrics):
+def attractiveness(project, bot, metrics, phase, invested_amount=None):
     raw = 0; total_w = 0
     for key, w in bot["weights"].items():
         if key=="intrinsic": val = metrics["intrinsic"]
@@ -189,6 +189,26 @@ def attractiveness(project, bot, metrics):
         raw_A = max(0, raw_A - (40-metrics["valuation_sanity"])*1.5)
     trust = project["trust_scores"].get(bot["id"], 50)
     noise = random.uniform(-5,5) if bot["type"]!="Random" else random.uniform(-10,10)
+    
+    # === CƠ CHẾ 1: DIMINISHING RETURNS ===
+    # Dự án càng nhiều vốn càng kém hấp dẫn
+    if invested_amount is not None and invested_amount > 0:
+        total_invested = project.get("total_invested", 0)
+        target = project["target_funding"]
+        if target > 0:
+            funding_ratio = total_invested / target
+            # Giảm điểm nếu đã gọi được nhiều vốn (trên 70%)
+            if funding_ratio > 0.7:
+                diminishing_penalty = (funding_ratio - 0.7) * 50  # Tối đa giảm 15 điểm
+                raw_A = max(0, raw_A - diminishing_penalty)
+    
+    # === CƠ CHẾ 2: BOT FATIGUE ===
+    # Bot sẽ chán nếu đầu tư quá lâu vào 1 dự án
+    consecutive_invest = project.get(f"bot_{bot['id']}_consecutive", 0)
+    if consecutive_invest > 2:  # Sau 3 phase liên tiếp
+        fatigue_penalty = min(15, (consecutive_invest - 2) * 5)
+        raw_A = max(0, raw_A - fatigue_penalty)
+    
     return raw_A * (trust/100) + noise
 
 def final_score(proj, phases_used, metrics):
@@ -300,16 +320,11 @@ def submit_deck():
     room['player_ready'][player_index] = True
     room['logs'].append(f"👤 Player {player_index + 1} đã chọn xong deck")
     
-    # KIỂM TRA TẤT CẢ ĐÃ CHỌN DECK CHƯA
     all_ready = all(room['player_ready'])
-    print(f"DEBUG: Player {player_index} ready. All ready: {all_ready}")
-    print(f"DEBUG: player_ready list: {room['player_ready']}")
     
     if all_ready:
-        print("DEBUG: ALL PLAYERS READY! Starting game...")
         room['logs'].append("🎮 TẤT CẢ ĐÃ SẴN SÀNG! BẮT ĐẦU GAME...")
         
-        # Khởi tạo game
         max_phase = max(p['max_phase'] for p in room['players'] if p is not None)
         room['max_phase'] = max_phase
         
@@ -320,23 +335,20 @@ def submit_deck():
         room['bot_alloc'] = bot_alloc
         
         room['phase'] = 1
-        room['status'] = 'playing'  # QUAN TRỌNG: Chuyển sang trạng thái playing
-        room['player_ready'] = [False] * room['num_players']  # Reset ready cho phase đầu
+        room['status'] = 'playing'
+        room['player_ready'] = [False] * room['num_players']
         room['pending_cards'] = {}
         room['phase_energy'] = [3] * room['num_players']
         room['mulligan_used'] = [False] * room['num_players']
         
-        # Phát bài ban đầu
         for idx, p in enumerate(room['players']):
             if p:
                 deck = p['active_deck']
                 p['current_hand'] = random.sample(deck, min(5, len(deck)))
                 p['energy_left'] = 3
                 p['current_phase'] = 0
-                print(f"DEBUG: Player {idx} hand: {len(p['current_hand'])} cards")
         
         room['logs'].append(f"🎮 GAME BẮT ĐẦU! Phase {room['phase']}/{room['max_phase']}")
-        print(f"DEBUG: Game started! Status: {room['status']}, Phase: {room['phase']}")
         
         return jsonify({'ok': True, 'game_started': True})
     
@@ -383,9 +395,6 @@ def host_state():
     if room['status'] == 'playing' and (room['phase'] > room['max_phase'] or all_ended):
         room['game_ended'] = True
         room['status'] = 'ended'
-    
-    # Log debug để kiểm tra
-    print(f"DEBUG host_state: status={room['status']}, phase={room['phase']}, all_ready={all(room['player_ready']) if room['status']=='playing' else False}")
     
     return jsonify({
         'status': room['status'],
@@ -497,7 +506,6 @@ def player_ready_phase():
     if room['status'] != 'playing':
         return jsonify({'error': 'Not playing'}), 400
     room['player_ready'][player_index] = True
-    print(f"DEBUG: Player {player_index} ready for phase. All ready: {all(room['player_ready'])}")
     return jsonify({'ok': True})
 
 @app.route('/api/use_reaction', methods=['POST'])
@@ -555,7 +563,47 @@ def run_phase():
     players = room['players']
     logs = []
     
-    print(f"DEBUG: Running phase {phase}")
+    # === CƠ CHẾ 3: RANDOM SHOCK EVENTS ===
+    # Mỗi phase có 30% chance xảy ra shock event
+    shock_event = None
+    if random.random() < 0.3:  # 30% mỗi phase
+        shock_type = random.choice(["hype_crash", "transparency_boost", "market_meltdown", "regulatory_crackdown", "tech_breakthrough"])
+        
+        if shock_type == "hype_crash":
+            for proj in players:
+                if proj:
+                    proj['hype'] = clamp(proj['hype'] - random.randint(15, 30), 0, 100)
+            logs.append("💥 SHOCK EVENT: THỊ TRƯỜNG SỤP ĐỔ! Tất cả dự án giảm Hype 15-30 điểm!")
+            shock_event = "hype_crash"
+            
+        elif shock_type == "transparency_boost":
+            for proj in players:
+                if proj:
+                    proj['transparency'] = clamp(proj['transparency'] + random.randint(10, 20), 0, 100)
+            logs.append("✨ SHOCK EVENT: PHONG TRÀO MINH BẠCH! Tất cả dự án tăng Transparency 10-20 điểm!")
+            shock_event = "transparency_boost"
+            
+        elif shock_type == "market_meltdown":
+            for proj in players:
+                if proj:
+                    proj['price'] *= random.uniform(0.7, 0.9)
+            logs.append("📉 SHOCK EVENT: KHỦNG HOẢNG KINH TẾ! Giá sản phẩm giảm 10-30%!")
+            shock_event = "market_meltdown"
+            
+        elif shock_type == "regulatory_crackdown":
+            for proj in players:
+                if proj:
+                    proj['transparency'] = clamp(proj['transparency'] - random.randint(10, 25), 0, 100)
+            logs.append("⚖️ SHOCK EVENT: SIẾT CHẶT PHÁP LÝ! Tất cả dự án giảm Transparency 10-25 điểm!")
+            shock_event = "regulatory_crackdown"
+            
+        elif shock_type == "tech_breakthrough":
+            for proj in players:
+                if proj:
+                    proj['hype'] = clamp(proj['hype'] + random.randint(10, 25), 0, 100)
+                    proj['price'] *= random.uniform(1.05, 1.15)
+            logs.append("🚀 SHOCK EVENT: ĐỘT PHÁ CÔNG NGHỆ! Tất cả dự án tăng Hype 10-25 điểm và giá 5-15%!")
+            shock_event = "tech_breakthrough"
     
     # Xử lý từng dự án
     for idx, proj in enumerate(players):
@@ -613,82 +661,86 @@ def run_phase():
             logs.append(f"  → Dự án {idx+1} kết thúc (đã qua {proj['max_phase']} phases).")
         logs.append(f"  → Funding sau phase: {proj['funding_progress']*100:.1f}%")
     
-    # Xử lý bot (giữ nguyên logic cũ)
+    # Xử lý bot
     if room['bot_alloc']:
         bot_alloc = room['bot_alloc']
         A = {}
-        for bot in BOTS:
-            for idx, proj in enumerate(players):
+        
+        # Tính attractiveness với các cơ chế mới
+        for bot_idx, bot in enumerate(BOTS):
+            for p_idx, proj in enumerate(players):
                 if not proj or proj.get('status') != 'active' or proj['funding_progress'] >= 1 or proj.get('current_phase',0) >= proj['max_phase']:
-                    A[(bot['id'], idx)] = -1e9
+                    A[(bot['id'], p_idx)] = -1e9
                 else:
                     metrics = calculate_metrics(proj)
-                    A[(bot['id'], idx)] = attractiveness(proj, bot, metrics)
-        
-        for bot_idx, bot in enumerate(BOTS):
-            best_idx = max(range(len(players)), key=lambda i: A[(bot['id'], i)])
-            alloc_entry = bot_alloc[bot_idx]
-            for idx in range(len(players)):
-                invested = alloc_entry['perProject'][idx]
-                if invested == 0: continue
-                if players[idx].get('status') != 'active' or players[idx].get('current_phase',0) >= players[idx]['max_phase']:
-                    continue
-                diff = A[(bot['id'], best_idx)] - A[(bot['id'], idx)]
-                if diff > 15: withdraw_ratio = 1.0
-                elif diff > 5: withdraw_ratio = 0.3
-                else: withdraw_ratio = 0.0
-                if withdraw_ratio > 0:
-                    desired = invested * withdraw_ratio
-                    max_ratio = min(0.6, 0.2 + (phase-1)*0.05)
-                    max_withdraw = invested * max_ratio
-                    if desired > max_withdraw:
-                        extra = desired - max_withdraw
-                        actual = max_withdraw + extra*0.5
+                    invested_amount = bot_alloc[bot_idx]['perProject'][p_idx]
+                    # Cập nhật số phase liên tiếp đầu tư
+                    if invested_amount > 0:
+                        consecutive = proj.get(f"bot_{bot['id']}_consecutive", 0) + 1
+                        proj[f"bot_{bot['id']}_consecutive"] = consecutive
                     else:
-                        actual = desired
-                    if actual <= players[idx]['available_cash']:
-                        players[idx]['available_cash'] -= actual
-                        alloc_entry['perProject'][idx] -= actual
-                        alloc_entry['idle'] += actual
-                        logs.append(f"🐋 Bot {bot['type']} rút {actual:.0f} từ dự án {idx+1}")
-                    else:
-                        players[idx]['status'] = 'bankrupt'
-                        players[idx]['funding_progress'] = 0
-                        logs.append(f"💀 Dự án {idx+1} PHÁ SẢN!")
+                        proj[f"bot_{bot['id']}_consecutive"] = 0
+                    
+                    A[(bot['id'], p_idx)] = attractiveness(proj, bot, metrics, phase, invested_amount)
         
+        # Rút vốn và đầu tư
         for bot_idx, bot in enumerate(BOTS):
+            # Tìm các dự án có điểm cao
+            candidates = [i for i,p in enumerate(players) if p and p.get('status')=='active' and p['funding_progress']<1 and p.get('current_phase',0) < p['max_phase']]
+            if not candidates:
+                continue
+            
+            # Sắp xếp theo điểm
+            candidates_sorted = sorted(candidates, key=lambda i: A[(bot['id'], i)], reverse=True)
+            
+            # === CƠ CHẾ 1 MỞ RỘNG: Đầu tư vào TOP 2-3 dự án thay vì chỉ 1 ===
+            top_n = min(3, len(candidates_sorted))  # Đầu tư vào tối đa 3 dự án
+            top_projects = candidates_sorted[:top_n]
+            
             alloc_entry = bot_alloc[bot_idx]
             idle = alloc_entry['idle']
-            if idle <= 0: continue
-            candidates = [i for i,p in enumerate(players) if p and p['status']=='active' and p['funding_progress']<1 and p.get('current_phase',0) < p['max_phase']]
-            if not candidates: continue
-            attrs = [A[(bot['id'], i)] for i in candidates]
-            min_a = min(attrs)
-            shifted = [max(0, a-min_a+0.01) for a in attrs]
-            sum_exp = sum(math.exp(a/20) for a in shifted)
-            probs = [math.exp(a/20)/sum_exp for a in shifted]
-            remaining = idle
-            for _ in range(5):
-                if remaining <= 0: break
-                for j, idx in enumerate(candidates):
-                    invest = remaining * probs[j]
-                    cap = min(invest, players[idx]['target_funding']*0.25 - players[idx]['total_invested'])
-                    if phase == 1:
-                        cap = min(cap, players[idx]['target_funding']*0.2 - players[idx]['total_invested'])
-                    if cap > 0:
-                        players[idx]['total_invested'] += cap
-                        players[idx]['available_cash'] += cap
-                        players[idx]['funding_progress'] = min(1.0, players[idx]['total_invested']/players[idx]['target_funding'])
-                        alloc_entry['perProject'][idx] += cap
-                        remaining -= cap
-                        logs.append(f"💸 Bot {bot['type']} đầu tư {cap:.0f} vào dự án {idx+1}")
-            alloc_entry['idle'] = remaining
+            
+            if idle > 0:
+                # Chia tiền cho các dự án top
+                for rank, p_idx in enumerate(top_projects):
+                    # Dự án top 1 nhận nhiều hơn
+                    weight = 1.0 if rank == 0 else (0.5 if rank == 1 else 0.3)
+                    invest_amount = min(idle * 0.15 * weight, players[p_idx]['target_funding'] * 0.12)
+                    
+                    if invest_amount > 0 and players[p_idx]['funding_progress'] < 1:
+                        players[p_idx]['total_invested'] += invest_amount
+                        players[p_idx]['available_cash'] += invest_amount
+                        players[p_idx]['funding_progress'] = min(1.0, players[p_idx]['total_invested'] / players[p_idx]['target_funding'])
+                        alloc_entry['perProject'][p_idx] += invest_amount
+                        alloc_entry['idle'] -= invest_amount
+                        logs.append(f"💰 Bot {bot['type']} đầu tư ${invest_amount:,.0f} vào dự án {p_idx+1}")
+                        idle = alloc_entry['idle']
+            
+            # Xử lý rút vốn - GIẢM tỷ lệ rút
+            for p_idx in range(len(players)):
+                invested = alloc_entry['perProject'][p_idx]
+                if invested == 0 or p_idx not in candidates:
+                    continue
+                
+                # Kiểm tra nếu dự án này không còn trong top
+                if p_idx not in top_projects:
+                    # Rút một phần thay vì toàn bộ
+                    withdraw_ratio = 0.4  # Chỉ rút 40%
+                    desired = invested * withdraw_ratio
+                    max_withdraw = invested * 0.5
+                    actual = min(desired, max_withdraw)
+                    
+                    if actual <= players[p_idx]['available_cash']:
+                        players[p_idx]['available_cash'] -= actual
+                        alloc_entry['perProject'][p_idx] -= actual
+                        alloc_entry['idle'] += actual
+                        logs.append(f"🔄 Bot {bot['type']} rút ${actual:,.0f} từ dự án {p_idx+1} (chuyển sang dự án mới)")
     
     # Reset cho phase tiếp theo
     room['pending_cards'] = {}
     room['player_ready'] = [False] * room['num_players']
     room['phase'] += 1
-    room['logs'] = logs + room.get('logs', [])[-50:]  # Giữ 50 log gần nhất
+    room['logs'] = logs + room.get('logs', [])[-50:]
     
     # Kiểm tra game kết thúc
     all_ended = all(p is None or p.get('current_phase',0) >= p['max_phase'] for p in players)
@@ -699,7 +751,7 @@ def run_phase():
         room['status'] = 'ended'
         room['logs'].append("🏆 GAME KẾT THÚC! 🏆")
     
-    # Phát bài mới cho phase tiếp theo nếu chưa kết thúc
+    # Phát bài mới cho phase tiếp theo
     if not game_ended:
         for idx, proj in enumerate(players):
             if proj and proj.get('status') == 'active' and proj['funding_progress'] < 1 and proj.get('current_phase',0) < proj['max_phase']:
@@ -713,7 +765,8 @@ def run_phase():
         'ended': game_ended,
         'phase': room['phase'],
         'logs': logs,
-        'game_ended': game_ended
+        'game_ended': game_ended,
+        'shock_event': shock_event
     })
 
 if __name__ == '__main__':
