@@ -91,6 +91,7 @@
         if (interval) clearInterval(interval);
         interval = setInterval(async () => {
             let state = await fetch(`/api/host_state?room_id=${roomId}`).then(r=>r.json());
+             console.log("Host state:", state);
             document.getElementById('playerCount').innerText = state.players_joined;
             if (state.rankings) {
                 let html = '';
