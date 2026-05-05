@@ -758,6 +758,7 @@ def run_phase():
                 deck = proj['active_deck']
                 proj['current_hand'] = random.sample(deck, min(5, len(deck)))
                 proj['energy_left'] = 3
+                proj['energy_used_this_phase'] = 0
                 if idx < len(room['mulligan_used']):
                     room['mulligan_used'][idx] = False
     
