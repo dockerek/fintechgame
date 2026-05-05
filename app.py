@@ -8,228 +8,139 @@ app.secret_key = 'startup-game-secret'
 
 # ===================== DỮ LIỆU CỐ ĐỊNH =====================
 SCENARIOS = [
-    {"id":1,"name":"Tin tốt nhẹ","cat":"Market","delta":{"price":0.05,"cogs":0,"hype":10,"sentiment":5,"transparency":0,"reg_risk":0}},
-    {"id":2,"name":"Tin tốt vừa","cat":"Market","delta":{"price":0.1,"cogs":-0.05,"hype":20,"sentiment":10,"transparency":0,"reg_risk":0}},
-    {"id":3,"name":"Tin xấu nhẹ","cat":"Market","delta":{"price":-0.05,"cogs":0.03,"hype":-10,"sentiment":-5,"transparency":0,"reg_risk":0}},
-    {"id":4,"name":"Tin xấu vừa","cat":"Market","delta":{"price":-0.1,"cogs":0.05,"hype":-20,"sentiment":-15,"transparency":-5,"reg_risk":5}},
-    {"id":5,"name":"Khủng hoảng nhẹ","cat":"Market","delta":{"price":-0.15,"cogs":0.1,"hype":-30,"sentiment":-20,"transparency":-10,"reg_risk":10}},
-    {"id":6,"name":"Khủng hoảng nặng","cat":"Market","delta":{"price":-0.25,"cogs":0.15,"hype":-40,"sentiment":-30,"transparency":-20,"reg_risk":20}},
-    {"id":7,"name":"Máy móc hỏng nhẹ","cat":"Internal","delta":{"cogs":0.05,"hype":-5,"transparency":-5,"trust_all":-5,"runway":-1}},
-    {"id":8,"name":"Lỗi sản xuất vừa","cat":"Internal","delta":{"cogs":0.1,"hype":-10,"transparency":-10,"trust_all":-10,"runway":-2}},
-    {"id":9,"name":"Rò rỉ dữ liệu","cat":"Internal","delta":{"cogs":0,"hype":-15,"transparency":-20,"trust_all":-15,"runway":0}},
-    {"id":10,"name":"Nhân sự chủ chốt nghỉ","cat":"Internal","delta":{"cogs":0.03,"hype":-10,"transparency":-5,"trust_all":-5,"runway":0}},
-    {"id":11,"name":"Được giải thưởng","cat":"Internal","delta":{"cogs":-0.05,"hype":15,"transparency":10,"trust_all":10,"runway":0}},
-    {"id":12,"name":"Audit nội bộ tốt","cat":"Internal","delta":{"cogs":0,"hype":5,"transparency":15,"trust_all":10,"runway":0}},
-    {"id":13,"name":"Đối thủ giảm giá","cat":"External","delta":{"price":-0.05,"marketing_eff":-0.1,"hype":-5,"transparency":0}},
-    {"id":14,"name":"Đối thủ ra sản phẩm mới","cat":"External","delta":{"price":-0.1,"marketing_eff":-0.2,"hype":-15,"transparency":-5}},
-    {"id":15,"name":"Hợp tác chiến lược","cat":"External","delta":{"price":0.05,"marketing_eff":0.15,"hype":15,"transparency":5}},
-    {"id":16,"name":"Bị kiện bản quyền","cat":"External","delta":{"price":-0.08,"marketing_eff":-0.15,"hype":-20,"transparency":-10}},
-    {"id":17,"name":"Được cấp bằng sáng chế","cat":"External","delta":{"price":0.1,"marketing_eff":0.1,"hype":10,"transparency":5}},
-    {"id":18,"name":"Tin đồn thâu tóm","cat":"External","delta":{"price":0.15,"marketing_eff":0.05,"hype":25,"transparency":-5}},
-    {"id":19,"name":"Thanh tra đột xuất","cat":"Regulatory","delta":{"reg_risk":25,"transparency":-10,"trust_all":-10,"legal_cost_percent":5}},
-    {"id":20,"name":"Được cấp phép sandbox","cat":"Regulatory","delta":{"reg_risk":-30,"transparency":15,"trust_all":15,"legal_cost_percent":-3}},
-    {"id":21,"name":"Thay đổi luật có lợi","cat":"Regulatory","delta":{"reg_risk":-15,"transparency":5,"trust_all":5,"legal_cost_percent":0}},
-    {"id":22,"name":"Thay đổi luật bất lợi","cat":"Regulatory","delta":{"reg_risk":25,"transparency":-10,"trust_all":-10,"legal_cost_percent":5}},
-    {"id":23,"name":"Kiểm toán thuế","cat":"Regulatory","delta":{"reg_risk":10,"transparency":-5,"trust_all":-5,"legal_cost_percent":2}},
-    {"id":24,"name":"Chứng nhận quốc tế","cat":"Regulatory","delta":{"reg_risk":-10,"transparency":10,"trust_all":10,"legal_cost_percent":-2}},
-    {"id":25,"name":"Lỗ hổng nhỏ","cat":"Security","delta":{"security":-10,"transparency":-5,"trust_all":-5,"hype":-5}},
-    {"id":26,"name":"Hack smart contract","cat":"Security","delta":{"security":-30,"transparency":-20,"trust_all":-20,"hype":-15}},
-    {"id":27,"name":"Mất private key","cat":"Security","delta":{"security":-20,"transparency":-15,"trust_all":-15,"hype":-10}},
-    {"id":28,"name":"Audit bảo mật pass","cat":"Security","delta":{"security":20,"transparency":10,"trust_all":10,"hype":5}},
-    {"id":29,"name":"Multi‑sig được kích hoạt","cat":"Security","delta":{"security":10,"transparency":5,"trust_all":5,"hype":0}},
-    {"id":30,"name":"Bug bounty thành công","cat":"Security","delta":{"security":15,"transparency":5,"trust_all":5,"hype":5}},
+    {"id":1,"name":"📈 Tin tốt thị trường","delta":{"price":0.08,"hype":15,"transparency":0}},
+    {"id":2,"name":"📉 Tin xấu thị trường","delta":{"price":-0.08,"hype":-15,"transparency":-5}},
+    {"id":3,"name":"🏆 Được giải thưởng","delta":{"hype":20,"transparency":10}},
+    {"id":4,"name":"⚠️ Rò rỉ dữ liệu","delta":{"hype":-20,"transparency":-15}},
+    {"id":5,"name":"🤝 Đối tác chiến lược","delta":{"hype":15,"transparency":5,"price":0.05}},
+    {"id":6,"name":"🔒 Audit bảo mật","delta":{"transparency":15,"hype":5}},
+    {"id":7,"name":"📰 Truyền thông đưa tin","delta":{"hype":25,"transparency":-5}},
+    {"id":8,"name":"💸 Đối thủ giảm giá","delta":{"price":-0.1,"hype":-10}},
+    {"id":9,"name":"⚖️ Thanh tra đột xuất","delta":{"transparency":-10,"hype":-10}},
+    {"id":10,"name":"🚀 Sản phẩm đột phá","delta":{"hype":30,"transparency":5,"price":0.1}},
 ]
 
-ACTIVE_CARDS_FULL = [
-    {"id":"A1","name":"Marketing Blitz","cost":2,"type":"red","desc":"Tăng Hype, giảm Transparency","effect":{"hype":25,"transparency":-5,"cost_percent":3}},
-    {"id":"A2","name":"Viral Campaign","cost":3,"type":"red","desc":"Tăng Hype mạnh","effect":{"hype":40,"transparency":-10,"cost_percent":5}},
-    {"id":"A3","name":"Flash Sale","cost":2,"type":"red","desc":"Giảm giá tạm thời, tăng Hype","effect":{"price_percent":-15,"hype":15}},
-    {"id":"A4","name":"Influencer Deal","cost":2,"type":"red","desc":"Tăng Hype và Visibility","effect":{"hype":20,"visibility":15,"cost_percent":2}},
-    {"id":"A5","name":"Airdrop","cost":3,"type":"red","desc":"Tăng Hype và Utility","effect":{"hype":30,"utility":5,"cost_percent":4}},
-    {"id":"A6","name":"FOMO Campaign","cost":2,"type":"red","desc":"Tăng Hype, thêm funding","effect":{"hype":20,"funding_boost_percent":5}},
-    {"id":"A7","name":"Celebrity Endorsement","cost":2,"type":"red","desc":"Tăng Hype, giảm nhẹ minh bạch","effect":{"hype":25,"transparency":-3,"cost_percent":4}},
-    {"id":"A8","name":"Token Burn Announce","cost":3,"type":"red","desc":"Tăng Hype, Utility, Transparency","effect":{"hype":15,"utility":10,"transparency":5}},
-    {"id":"A9","name":"Limited Offer","cost":1,"type":"red","desc":"Tăng Hype, Visibility nhẹ","effect":{"hype":10,"visibility":5}},
-    {"id":"A10","name":"Shill Army","cost":2,"type":"red","desc":"Tăng Hype cao, giảm minh bạch","effect":{"hype":30,"transparency":-15,"cost_percent":2}},
-    {"id":"A11","name":"Pre-sale Discount","cost":2,"type":"red","desc":"Giảm giá, tăng funding","effect":{"price_percent":-10,"funding_boost_percent":10}},
-    {"id":"A12","name":"Media Blast","cost":2,"type":"red","desc":"Tăng Hype, Visibility","effect":{"hype":20,"visibility":10,"cost_percent":1}},
-    {"id":"A13","name":"Meme Marketing","cost":1,"type":"red","desc":"Tăng Hype nhẹ, giảm minh bạch","effect":{"hype":15,"transparency":-2}},
-    {"id":"A14","name":"Aggressive Pricing","cost":2,"type":"red","desc":"Giảm giá sâu, tăng Hype","effect":{"price_percent":-20,"hype":10}},
-    {"id":"D1","name":"Cost Cutting","cost":1,"type":"green","desc":"Giảm COGS, tăng minh bạch","effect":{"cogs_percent":-3,"transparency":5}},
-    {"id":"D2","name":"Community Update","cost":1,"type":"green","desc":"Tăng Hype nhẹ, minh bạch","effect":{"hype":5,"transparency":3}},
-    {"id":"D3","name":"Third Party Audit","cost":2,"type":"green","desc":"Tăng minh bạch, giảm rủi ro","effect":{"transparency":15,"reg_risk":-10,"cost_percent":5}},
-    {"id":"D4","name":"Vesting Pledge","cost":1,"type":"green","desc":"Tăng minh bạch, trust","effect":{"transparency":10,"trust_all":5}},
-    {"id":"D5","name":"Emergency Fund","cost":2,"type":"green","desc":"Tăng runway","effect":{"runway":2,"cost_percent":5}},
-    {"id":"D6","name":"Open Book","cost":2,"type":"green","desc":"Tăng minh bạch mạnh","effect":{"transparency":20,"cost_percent":2}},
-    {"id":"D7","name":"Bug Bounty Program","cost":1,"type":"green","desc":"Tăng security, minh bạch","effect":{"security":10,"transparency":5}},
-    {"id":"D8","name":"Legal Shield","cost":2,"type":"green","desc":"Giảm rủi ro pháp lý","effect":{"reg_risk":-15,"cost_percent":3}},
-    {"id":"D9","name":"Slow & Steady","cost":1,"type":"green","desc":"Tăng minh bạch, Hype nhẹ","effect":{"transparency":5,"hype":2}},
-    {"id":"D10","name":"Crisis Management","cost":2,"type":"green","desc":"Giảm 50% delta tiêu cực","effect":{"halve_negative_delta":1}},
-    {"id":"D11","name":"Supply Chain Fix","cost":2,"type":"green","desc":"Giảm COGS, tăng minh bạch","effect":{"cogs_percent":-5,"transparency":5}},
-    {"id":"D12","name":"Investor Call","cost":1,"type":"green","desc":"Tăng trust tất cả bot","effect":{"trust_all":10,"cost_percent":1}},
-    {"id":"D13","name":"Transparency Report","cost":2,"type":"green","desc":"Tăng minh bạch, giảm Hype","effect":{"transparency":15,"hype":-5}},
-    {"id":"D14","name":"Multi‑sig Enable","cost":1,"type":"green","desc":"Tăng security, minh bạch","effect":{"security":15,"transparency":5}},
-    {"id":"T1","name":"Whale Discount","cost":3,"type":"purple","desc":"Tăng funding, giảm trust Whale","effect":{"funding_boost_percent":15,"trust_whale":-10,"cost_percent":2}},
-    {"id":"T2","name":"Token Buyback","cost":2,"type":"purple","desc":"Giảm funding, tăng trust, utility","effect":{"funding_boost_percent":-10,"trust_all":15,"utility":10,"cost_percent":10}},
-    {"id":"T3","name":"Secondary Offering","cost":3,"type":"purple","desc":"Tăng funding, giảm trust, dilution","effect":{"funding_boost_percent":20,"trust_all":-15,"dilution":10}},
-    {"id":"T4","name":"DAO Vote","cost":2,"type":"purple","desc":"Tăng minh bạch, trust","effect":{"transparency":5,"trust_all":5}},
-    {"id":"T5","name":"Staking Launch","cost":2,"type":"purple","desc":"Tăng utility, giảm velocity","effect":{"utility":15,"velocity":-0.2}},
-    {"id":"T6","name":"Treasury Diversify","cost":2,"type":"purple","desc":"Giảm rủi ro, tăng trust","effect":{"reg_risk":-10,"trust_all":10}},
-    {"id":"T7","name":"Token Split","cost":2,"type":"purple","desc":"Tăng funding, Hype, dilution","effect":{"funding_boost_percent":5,"hype":10,"dilution":5}},
-    {"id":"T8","name":"Governance Proposal","cost":1,"type":"purple","desc":"Tăng minh bạch, trust","effect":{"transparency":5,"trust_all":5}},
-    {"id":"T9","name":"Vesting Extension","cost":2,"type":"purple","desc":"Tăng trust, minh bạch","effect":{"trust_all":20,"transparency":10,"cost_percent":2}},
-    {"id":"T10","name":"Liquidity Mining","cost":3,"type":"purple","desc":"Tăng utility, giảm velocity","effect":{"utility":20,"velocity":-0.3,"cost_percent":5}},
-    {"id":"T11","name":"Strategic Partnership","cost":2,"type":"purple","desc":"Tăng trust, giảm rủi ro","effect":{"trust_all":15,"reg_risk":-5,"cost_percent":3}},
-    {"id":"T12","name":"Burn Mechanism","cost":2,"type":"purple","desc":"Tăng utility, Hype","effect":{"utility":15,"hype":10,"cost_percent":2}},
-    {"id":"T13","name":"Airdrop to Holders","cost":2,"type":"purple","desc":"Tăng trust, Hype","effect":{"trust_all":10,"hype":15,"cost_percent":4}},
-    {"id":"T14","name":"Equity Swap","cost":3,"type":"purple","desc":"Tăng funding mạnh, giảm trust, dilution cao","effect":{"funding_boost_percent":30,"trust_all":-20,"dilution":20}},
+ACTIVE_CARDS = [
+    {"id":"A1","name":"🔥 Marketing Blitz","cost":2,"type":"red","desc":"Tăng Hype +25, giảm Transparency -5","effect":{"hype":25,"transparency":-5}},
+    {"id":"A2","name":"📱 Viral Campaign","cost":3,"type":"red","desc":"Tăng Hype +40, giảm Transparency -10","effect":{"hype":40,"transparency":-10}},
+    {"id":"A3","name":"💰 Flash Sale","cost":2,"type":"red","desc":"Giảm giá 15%, tăng Hype +15","effect":{"price_percent":-15,"hype":15}},
+    {"id":"A4","name":"⭐ Influencer Deal","cost":2,"type":"red","desc":"Tăng Hype +20","effect":{"hype":20}},
+    {"id":"A5","name":"🎁 Airdrop","cost":3,"type":"red","desc":"Tăng Hype +30, tốn chi phí","effect":{"hype":30,"cost":10000}},
+    {"id":"A6","name":"📢 PR Campaign","cost":2,"type":"red","desc":"Tăng Hype +15, Visibility +10","effect":{"hype":15}},
+    {"id":"A7","name":"💎 Community Building","cost":1,"type":"green","desc":"Tăng Transparency +10","effect":{"transparency":10}},
+    {"id":"A8","name":"🔍 Third Party Audit","cost":2,"type":"green","desc":"Tăng Transparency +20","effect":{"transparency":20}},
+    {"id":"A9","name":"📊 Open Book","cost":2,"type":"green","desc":"Tăng Transparency +25, tốn chi phí","effect":{"transparency":25,"cost":5000}},
+    {"id":"A10","name":"🛡️ Bug Bounty","cost":1,"type":"green","desc":"Tăng Transparency +8","effect":{"transparency":8}},
+    {"id":"A11","name":"📝 Transparency Report","cost":2,"type":"green","desc":"Tăng Transparency +15, giảm Hype -5","effect":{"transparency":15,"hype":-5}},
+    {"id":"A12","name":"🤝 Investor Call","cost":1,"type":"green","desc":"Tăng Transparency +5, tăng Hype +5","effect":{"transparency":5,"hype":5}},
+    {"id":"A13","name":"💎 Token Buyback","cost":3,"type":"purple","desc":"Tăng Funding 10%, tốn chi phí","effect":{"funding_boost":0.1,"cost":20000}},
+    {"id":"A14","name":"🏦 Secondary Offering","cost":3,"type":"purple","desc":"Tăng Funding 20%","effect":{"funding_boost":0.2}},
+    {"id":"A15","name":"🗳️ DAO Vote","cost":2,"type":"purple","desc":"Tăng Transparency +5, Trust +5","effect":{"transparency":5}},
+    {"id":"A16","name":"⛓️ Staking Launch","cost":2,"type":"purple","desc":"Tăng Utility","effect":{"utility":15}},
+    {"id":"A17","name":"🏦 Treasury Diversify","cost":2,"type":"purple","desc":"Giảm rủi ro","effect":{"risk_reduce":10}},
+    {"id":"A18","name":"📈 Strategic Partnership","cost":2,"type":"purple","desc":"Tăng Trust +10, Funding +5%","effect":{"funding_boost":0.05}},
+    {"id":"A19","name":"🔥 Token Burn","cost":2,"type":"purple","desc":"Tăng Hype +10, Utility +10","effect":{"hype":10}},
+    {"id":"A20","name":"🎁 Airdrop to Holders","cost":2,"type":"purple","desc":"Tăng Trust +10, Hype +10","effect":{"hype":10}},
+    {"id":"A21","name":"💪 Cost Cutting","cost":1,"type":"green","desc":"Giảm chi phí 5%","effect":{"cost_reduce":0.05}},
+    {"id":"A22","name":"🚀 FOMO Campaign","cost":2,"type":"red","desc":"Tăng Hype +25, Funding +5%","effect":{"hype":25,"funding_boost":0.05}},
 ]
-
-ALL_ACTIVE_CARDS = ACTIVE_CARDS_FULL
 
 REACTION_CARDS = [
-    {"id":"R1","name":"Lock‑up Extension","trigger":"on_bot_withdraw","desc":"Giảm bán tháo khi bot rút","cost_percent":2,"effect":{"sell_pressure_reduce":0.5}},
-    {"id":"R2","name":"Emergency PR","trigger":"on_scenario_market_bad","desc":"Giảm 50% delta xấu","cost_percent":3,"effect":{"halve_negative_delta":1}},
-    {"id":"R3","name":"Whale Whisperer","trigger":"on_whale_trust<30","desc":"Tăng trust của Whale","cost_percent":5,"effect":{"whale_trust":10}},
-    {"id":"R4","name":"Damage Control","trigger":"on_transparency<30","desc":"Tăng transparency, giảm Hype","cost_percent":2,"effect":{"transparency":10,"hype":-5}},
-    {"id":"R5","name":"Liquidity Injection","trigger":"on_circuit_breaker","desc":"Rút ngắn circuit breaker","cost_percent":8,"effect":{"circuit_breaker_reduce":1}},
-    {"id":"R6","name":"Legal Emergency","trigger":"on_reg_risk>70","desc":"Giảm rủi ro pháp lý","cost_percent":4,"effect":{"reg_risk":-20}},
-    {"id":"R7","name":"Security Patch","trigger":"on_security<30","desc":"Tăng security","cost_percent":3,"effect":{"security":15}},
-    {"id":"R8","name":"FOMO Suppression","trigger":"on_hype>80","desc":"Giảm Hype, tăng transparency","cost_percent":1,"effect":{"hype":-15,"transparency":5}},
-    {"id":"R9","name":"Investor Assurance","trigger":"on_trust_any_bot<20","desc":"Tăng trust cho bot đó","cost_percent":2,"effect":{"trust_single":15}},
-    {"id":"R10","name":"Runway Boost","trigger":"on_runway<3","desc":"Thêm 3 tháng runway","cost_percent":10,"effect":{"runway":3}},
+    {"id":"R1","name":"🔒 Lock-up Extension","desc":"Giảm bán tháo khi bot rút","cost":5000},
+    {"id":"R2","name":"📢 Emergency PR","desc":"Giảm 50% damage từ tin xấu","cost":3000},
+    {"id":"R3","name":"🐋 Whale Whisperer","desc":"Tăng trust của nhà đầu tư lớn","cost":10000},
+    {"id":"R4","name":"🩹 Damage Control","desc":"Tăng transparency +10","cost":2000},
 ]
 
+# Tạo 50 bot đầu tư
 random.seed(42)
 BOTS = []
-for i in range(1, 201):
-    bot_type = random.choices(["FOMO","Value Hunter","Whale","Random"], weights=[50,30,10,10])[0]
-    wealth_class = random.choices(["small","medium","large"], weights=[40,40,20])[0]
-    wealth = {"small":random.randint(10000,50000), "medium":random.randint(100000,500000), "large":random.randint(500000,2000000)}[wealth_class]
-    hype_sens = round(random.uniform(1.2,1.8),2)
-    trans_sens = round(random.uniform(0.5,1.2),2)
-    decay = round(random.uniform(0.1,0.3),2)
-    if bot_type == "FOMO":
-        weights = {"intrinsic":0.1,"valuation":0.1,"roi_norm":0.1,"scalability":0.05,"transparency":0.05,"hype":0.28,"visibility":0.09,"funding_prog":0.09,"liquidity":0.14}
-    elif bot_type == "Value Hunter":
-        weights = {"intrinsic":0.27,"valuation":0.2,"roi_norm":0.15,"scalability":0.03,"transparency":0.14,"funding_prog":0.05,"liquidity":0.07}
-    elif bot_type == "Whale":
-        weights = {"intrinsic":0.17,"valuation":0.2,"roi_norm":0.15,"scalability":0.03,"transparency":0.18,"funding_prog":0.05,"liquidity":0.07}
-    else:
-        weights = {"intrinsic":0.1,"valuation":0.1,"roi_norm":0.1,"scalability":0.05,"transparency":0.05,"hype":0.08,"visibility":0.05,"funding_prog":0.09,"liquidity":0.18}
-    BOTS.append({"id":i,"type":bot_type,"wealth_class":wealth_class,"wealth":wealth,"hype_sens":hype_sens,"trans_sens":trans_sens,"memory_decay_rate":decay,"weights":weights})
+for i in range(1, 51):
+    bot_type = random.choices(["FOMO", "Value Hunter", "Whale", "Retail"], weights=[40, 30, 10, 20])[0]
+    wealth = random.randint(50000, 500000)
+    BOTS.append({
+        "id": i,
+        "type": bot_type,
+        "wealth": wealth,
+        "hype_sens": random.uniform(0.5, 2.0),
+        "trans_sens": random.uniform(0.5, 2.0),
+    })
 
-def clamp(x, lo, hi): return max(lo, min(hi, x))
+def clamp(x, lo, hi):
+    return max(lo, min(hi, x))
 
 def calculate_metrics(proj):
-    ch_fees = (proj["fee_ecom"] + proj["fee_retail"] + proj["fee_direct"]) / 100.0
-    price_real = proj["price"] * (1 - ch_fees)
-    cogs_unit = proj["material"] + proj["packaging"] + proj["shipping"] + proj["defect_rate"]*(proj["material"]+proj["packaging"]+proj["shipping"])
-    gm = (price_real - cogs_unit)/price_real if price_real>0 else 0
-    monthly_burn = proj["fixed_cost"] + proj["marketing_cost"] + (proj["loan"] * proj["interest_rate"]/100 /12)
-    burn_rate = monthly_burn / proj["target_funding"]
-    growth = (proj["units_m6"]/proj["units_m1"]) - 1 if proj["units_m1"]>0 else 0
-    unit_econ = clamp(20 + 20*(1 - math.exp(-5*(gm-0.2)/0.6)), 20, 40) if gm>0.2 else 20
-    burn_score = clamp(10 + 20*(1 - math.exp(-4*(0.3-burn_rate)/0.25)), 10, 30) if burn_rate<0.3 else 10
-    scal_score = clamp(10 + 20*(1 - math.exp(-3*growth/0.5)), 10, 30) if growth>0 else 10
-    intrinsic = unit_econ + burn_score + scal_score
-    equity = proj["equity_offered"]/100
-    post_money = proj["target_funding"]/equity if equity>0 else 1e12
-    revenue_year = proj["units_m6"] * 12 * price_real
-    mult = post_money/revenue_year if revenue_year>0 else 1000
-    if mult < 1: val_score = 30 - (1-mult)/1*30
-    elif mult <= 3: val_score = 80 + (mult-1)/2*20
-    elif mult <= 5: val_score = 80 - (mult-3)/2*40
-    else: val_score = max(0, 40 - (mult-5)/2*40)
-    val_score = clamp(val_score, 0, 100)
-    raw_roi = ((post_money - proj["target_funding"])/proj["target_funding"])*100 if proj["target_funding"]>0 else 0
-    if raw_roi<0: raw_roi=0
-    roi_norm = min(100, 20*math.log10(raw_roi+1))
-    base_reg = 20 if proj.get("has_license",False) else 80
-    if proj.get("legal_cost_spent",0) >= 0.05*proj["target_funding"]: base_reg += 20
-    reg_risk = clamp(base_reg - proj["transparency"]/10, 0, 100)
-    sec = 50 + (30 if proj.get("has_audit",False) else 0)+(20 if proj.get("multisig",False) else 0)-10*proj.get("count_hack_events",0)
-    sec = clamp(sec,0,100)
-    util = 50
-    for u in proj.get("utility_list",[]):
-        if u in ["governance","staking","burn","discount"]: util+=10
-    util = clamp(util,0,100)
-    avail_cash = proj.get("available_cash", proj["owner_equity"]+proj["loan"])
-    runway = math.floor(avail_cash / monthly_burn) if monthly_burn>0 else 999
-    total_invested = proj.get("total_invested",0)
-    total_supply = proj.get("total_supply_token",0)
-    vel = proj.get("velocity",1.0)
-    liquidity = 100 if total_supply==0 else min(100, (total_invested/(total_supply*vel))*100)
+    # Tính toán các chỉ số cơ bản
+    revenue_monthly = proj["units_m1"] * proj["price"]
+    cost_monthly = proj["fixed_cost"] + proj["marketing_cost"]
+    profit = revenue_monthly - cost_monthly
+    
+    # Intrinsic value dựa trên profit margin
+    if revenue_monthly > 0:
+        margin = profit / revenue_monthly
+        intrinsic = clamp(margin * 100, 0, 100)
+    else:
+        intrinsic = 0
+    
+    # Runway (số tháng có thể hoạt động)
+    monthly_burn = max(cost_monthly, 1000)
+    runway = proj.get("available_cash", proj["owner_equity"]) / monthly_burn
+    
+    # Funding progress
+    funding_progress = proj.get("funding_progress", 0)
+    
     return {
-        "intrinsic":intrinsic, "valuation_sanity":val_score, "roi_norm":roi_norm,
-        "growth":growth, "monthly_burn":monthly_burn, "available_cash":avail_cash,
-        "runway":runway, "liquidity":liquidity, "funding_progress":proj.get("funding_progress",0)
+        "intrinsic": intrinsic,
+        "profit": profit,
+        "runway": runway,
+        "funding_progress": funding_progress,
+        "available_cash": proj.get("available_cash", proj["owner_equity"])
     }
 
 def attractiveness(project, bot, metrics):
-    raw = 0; total_w = 0
-    for key, w in bot["weights"].items():
-        if key=="intrinsic": val = metrics["intrinsic"]
-        elif key=="valuation": val = metrics["valuation_sanity"]
-        elif key=="roi_norm": val = metrics["roi_norm"]
-        elif key=="scalability": val = clamp(metrics["growth"]*100,0,100)
-        elif key=="transparency": val = project["transparency"]
-        elif key=="hype": val = project["hype"]
-        elif key=="visibility": val = project["visibility"]
-        elif key=="funding_prog": val = metrics["funding_progress"]*100
-        elif key=="liquidity": val = metrics["liquidity"]
-        else: continue
-        sens = bot["hype_sens"] if key=="hype" else (bot["trans_sens"] if key=="transparency" else 1.0)
-        raw += val * w * sens
-        total_w += w
-    if total_w==0: return 0
-    raw_A = (raw/total_w)*100
-    if metrics["valuation_sanity"] < 40:
-        raw_A = max(0, raw_A - (40-metrics["valuation_sanity"])*1.5)
-    trust = project["trust_scores"].get(bot["id"], 50)
-    noise = random.uniform(-5,5) if bot["type"]!="Random" else random.uniform(-10,10)
-    return raw_A * (trust/100) + noise
+    # Tính điểm hấp dẫn của dự án đối với bot
+    score = 50
+    
+    # FOMO bot thích Hype
+    if bot["type"] == "FOMO":
+        score += project["hype"] * 0.3 * bot["hype_sens"]
+    
+    # Value Hunter thích Transparency và profit
+    if bot["type"] == "Value Hunter":
+        score += project["transparency"] * 0.3 * bot["trans_sens"]
+        score += metrics["intrinsic"] * 0.2
+    
+    # Whale thích cả hai
+    if bot["type"] == "Whale":
+        score += project["hype"] * 0.2 * bot["hype_sens"]
+        score += project["transparency"] * 0.2 * bot["trans_sens"]
+    
+    # Retail thì random hơn
+    if bot["type"] == "Retail":
+        score += project["hype"] * 0.15
+        score += project["transparency"] * 0.15
+    
+    # Thêm nhiễu ngẫu nhiên
+    score += random.uniform(-10, 10)
+    
+    return clamp(score, 0, 100)
 
-def process_withdraw(project, amount_invested, metrics, phase):
-    max_ratio = min(0.6, 0.2 + (phase-1)*0.05)
-    max_withdrawable = amount_invested * max_ratio
-    desired = amount_invested if metrics["funding_progress"] < 0.2 else amount_invested*0.3
-    if desired > max_withdrawable:
-        extra = desired - max_withdrawable
-        actual_receive = max_withdrawable + extra*0.5
-    else:
-        actual_receive = desired
-    if actual_receive <= project["available_cash"]:
-        project["available_cash"] -= actual_receive
-        return actual_receive
-    else:
-        project["status"] = "bankrupt"
-        project["funding_progress"] = 0
+def final_score(proj, phases_used):
+    if proj["funding_progress"] < 0.3:
         return 0
+    
+    funding_score = proj["funding_progress"] * 50
+    hype_score = proj["hype"] * 0.3
+    trans_score = proj["transparency"] * 0.2
+    
+    raw_score = funding_score + hype_score + trans_score
+    
+    # Bonus nếu kết thúc sớm
+    speed_bonus = max(0, (proj["max_phase"] - phases_used) * 2)
+    
+    return raw_score + speed_bonus
 
-def process_invest(project, bot, idle_wealth, phase):
-    invest_amount = idle_wealth * 0.15
-    cap = min(invest_amount, project["target_funding"]*0.25)
-    if phase == 1:
-        cap = min(cap, project["target_funding"]*0.2 - project["total_invested"])
-    if cap > 0 and project["funding_progress"] < 1.0:
-        project["total_invested"] += cap
-        project["available_cash"] += cap
-        project["funding_progress"] = min(1.0, project["total_invested"]/project["target_funding"])
-        return cap
-    return 0
-
-def final_score(proj, phases_used, metrics):
-    if proj["funding_progress"] < 0.5:
-        return 0
-    funding_score = proj["funding_progress"] * 30
-    speed_score = (100 - phases_used) * 0.2
-    roi_score = min(30, max(0, (metrics["roi_norm"]/100)*30))
-    trans_score = (proj["transparency"]/100)*20
-    raw = funding_score + speed_score + roi_score + trans_score
-    perf_phase = raw / phases_used if phases_used>0 else 0
-    return perf_phase * proj["scale_factor"] * (1 + proj["funding_progress"])
-
+# Lưu trữ phòng
 rooms = {}
 
 @app.route('/')
@@ -253,26 +164,25 @@ def create_room():
     num_players = data.get('num_players', 4)
     if num_players < 2 or num_players > 10:
         num_players = 4
+    
     room_id = str(uuid.uuid4())[:8]
     base_url = request.host_url.rstrip('/')
-    join_links = []
-    for i in range(num_players):
-        join_links.append(f"{base_url}/play/{room_id}/{i}")
+    join_links = [f"{base_url}/play/{room_id}/{i}" for i in range(num_players)]
+    
     rooms[room_id] = {
         'num_players': num_players,
         'players': [None] * num_players,
         'phase': 0,
         'max_phase': 0,
-        'status': 'waiting',
+        'status': 'waiting',  # waiting -> choosing_deck -> playing -> ended
         'bot_alloc': None,
         'logs': [],
         'player_ready': [False] * num_players,
         'pending_cards': {},
-        'phase_energy': [3] * num_players,
-        'mulligan_used': [False] * num_players,
-        'reaction_hand': [None] * num_players,
-        'game_ended': False
+        'game_ended': False,
+        'round_logs': []
     }
+    
     return jsonify({'room_id': room_id, 'join_links': join_links})
 
 @app.route('/api/submit_project', methods=['POST'])
@@ -281,26 +191,35 @@ def submit_project():
     room_id = data['room_id']
     player_index = data['player_index']
     project_data = data['project']
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
-    if player_index >= len(room['players']) or room['players'][player_index] is not None:
-        return jsonify({'error': 'Slot taken'}), 400
+    
+    # Khởi tạo các giá trị mặc định cho project
     project_data['trust_scores'] = {bot['id']: 50 for bot in BOTS}
     project_data['status'] = 'active'
     project_data['funding_progress'] = 0
     project_data['total_invested'] = 0
-    project_data['available_cash'] = project_data['owner_equity'] + project_data['loan']
-    project_data['legal_cost_spent'] = 0
-    project_data['velocity'] = 1.0
-    project_data['utility_list'] = project_data.get('utility_list', [])
+    project_data['available_cash'] = project_data['owner_equity']
     project_data['current_phase'] = 0
-    project_data['max_phase'] = project_data['max_phase']
+    project_data['active_deck'] = []
+    project_data['reaction_hand'] = []
+    project_data['current_hand'] = []
+    project_data['energy_left'] = 3
+    project_data['hype'] = 50
+    project_data['transparency'] = 50
+    
     room['players'][player_index] = project_data
     room['player_ready'][player_index] = True
+    
+    # Kiểm tra nếu tất cả đã submit project
     if all(p is not None for p in room['players']):
         room['status'] = 'choosing_deck'
         room['player_ready'] = [False] * room['num_players']
+        room['logs'].append("✅ Tất cả người chơi đã gửi dự án! Đang chờ chọn bài...")
+    
     return jsonify({'ok': True})
 
 @app.route('/api/submit_deck', methods=['POST'])
@@ -313,91 +232,92 @@ def submit_deck():
     
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
     
     if len(active_indices) != 22:
-        return jsonify({'error': 'Phải chọn đúng 22 active cards'}), 400
-    if len(reaction_indices) > 3:
-        return jsonify({'error': 'Tối đa 3 reaction cards'}), 400
+        return jsonify({'error': 'Phải chọn đúng 22 lá Active'}), 400
     
     proj = room['players'][player_index]
-    proj['active_deck'] = [ALL_ACTIVE_CARDS[i] for i in active_indices]
-    proj['reaction_hand'] = [REACTION_CARDS[i] for i in reaction_indices]
+    proj['active_deck'] = [ACTIVE_CARDS[i] for i in active_indices]
+    proj['reaction_hand'] = [REACTION_CARDS[i] for i in reaction_indices[:3]]
     
     room['player_ready'][player_index] = True
+    room['logs'].append(f"👤 Player {player_index + 1} đã chọn xong deck")
     
-    # KIỂM TRA TẤT CẢ ĐÃ CHỌN DECK CHƯA
-    print(f"Debug: Player {player_index} ready. All ready: {room['player_ready']}")
-    
+    # Kiểm tra nếu tất cả đã chọn deck
     if all(room['player_ready']):
-        print("Debug: All players ready, initializing game...")
-        # Tất cả đã chọn deck -> khởi tạo game
-        max_phase = max(p['max_phase'] for p in room['players'] if p is not None)
+        room['logs'].append("🎮 TẤT CẢ ĐÃ SẴN SÀNG! BẮT ĐẦU GAME...")
+        
+        # Khởi tạo game
+        max_phase = 7  # Mặc định 7 phases
         room['max_phase'] = max_phase
         
+        # Khởi tạo phân bổ bot
         bot_alloc = []
         for bot in BOTS:
             per = [0] * room['num_players']
             bot_alloc.append({'bot_id': bot['id'], 'perProject': per, 'idle': bot['wealth']})
         room['bot_alloc'] = bot_alloc
         
-        room['phase'] = 1  # BẮT ĐẦU TỪ PHASE 1
-        room['status'] = 'playing'  # CHUYỂN SANG TRẠNG THÁI PLAYING
-        room['player_ready'] = [False] * room['num_players']  # RESET READY CHO PHASE ĐẦU
+        # Khởi tạo phase đầu tiên
+        room['phase'] = 1
+        room['status'] = 'playing'
+        room['player_ready'] = [False] * room['num_players']
         room['pending_cards'] = {}
-        room['phase_energy'] = [3] * room['num_players']
         room['mulligan_used'] = [False] * room['num_players']
         
-        # Tạo bài ban đầu cho mỗi player
-        for idx, proj in enumerate(room['players']):
-            if proj:
-                deck = proj['active_deck']
-                proj['current_hand'] = random.sample(deck, min(5, len(deck)))
-                proj['energy_left'] = 3
-                proj['current_phase'] = 0  # ĐẢM BẢO BẮT ĐẦU TỪ PHASE 0
-                print(f"Debug: Player {idx} initial hand: {len(proj['current_hand'])} cards")
+        # Phát bài ban đầu cho mỗi player
+        for idx, p in enumerate(room['players']):
+            if p:
+                p['current_hand'] = random.sample(p['active_deck'], min(5, len(p['active_deck'])))
+                p['energy_left'] = 3
+                p['current_phase'] = 0
         
-        print(f"Debug: Game initialized. Status: {room['status']}, Phase: {room['phase']}")
+        room['logs'].append(f"🎮 GAME BẮT ĐẦU! Phase {room['phase']}/{room['max_phase']}")
         return jsonify({'ok': True, 'game_started': True})
     
     return jsonify({'ok': True, 'game_started': False})
+
+@app.route('/api/card_lists', methods=['GET'])
+def card_lists():
+    return jsonify({'active': ACTIVE_CARDS, 'reaction': REACTION_CARDS})
 
 @app.route('/api/host_state', methods=['GET'])
 def host_state():
     room_id = request.args.get('room_id')
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
     rankings = []
+    
     for i, proj in enumerate(room['players']):
         if proj:
-            ended = proj.get('current_phase', 0) >= proj['max_phase']
-            if ended:
-                proj_status = 'ended'
-            else:
-                proj_status = proj.get('status', 'active')
             metrics = calculate_metrics(proj)
-            if ended:
-                score = final_score(proj, proj['max_phase'], metrics)
-            else:
-                score = 0
+            ended = proj.get('current_phase', 0) >= proj['max_phase']
+            score = final_score(proj, proj.get('current_phase', 0)) if ended else 0
+            
             rankings.append({
                 'name': f"Player {i+1}",
                 'funding': proj['funding_progress'],
                 'hype': proj['hype'],
                 'transparency': proj['transparency'],
                 'score': score,
-                'scale': proj['scale'],
-                'status': proj_status,
+                'status': 'ended' if ended else 'playing',
                 'current_phase': proj.get('current_phase', 0),
                 'max_phase': proj['max_phase']
             })
         else:
             rankings.append({'name': f"Player {i+1}", 'funding': 0, 'score': 0, 'status': 'not_joined'})
+    
+    # Kiểm tra game kết thúc
     all_ended = all(p is None or p.get('current_phase', 0) >= p['max_phase'] for p in room['players'])
     if room['status'] == 'playing' and (room['phase'] > room['max_phase'] or all_ended):
         room['game_ended'] = True
         room['status'] = 'ended'
+        room['logs'].append("🏆 GAME KẾT THÚC! 🏆")
+    
     return jsonify({
         'status': room['status'],
         'phase': room['phase'],
@@ -406,7 +326,7 @@ def host_state():
         'max_players': room['num_players'],
         'logs': room.get('logs', []),
         'rankings': rankings,
-        'all_ready': all(room['player_ready']) if room['status']=='playing' else False,
+        'all_ready': all(room['player_ready']) if room['status'] == 'playing' else False,
         'game_ended': room.get('game_ended', False)
     })
 
@@ -414,13 +334,19 @@ def host_state():
 def player_state():
     room_id = request.args.get('room_id')
     player_index = int(request.args.get('player_index', -1))
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
+    
     if player_index < 0 or player_index >= len(room['players']) or room['players'][player_index] is None:
         return jsonify({'error': 'Player not found'}), 404
+    
     proj = room['players'][player_index]
     metrics = calculate_metrics(proj)
+    
+    # Lấy danh sách nhà đầu tư
     investors = []
     if room['bot_alloc']:
         for alloc in room['bot_alloc']:
@@ -429,27 +355,27 @@ def player_state():
                 bot = next((b for b in BOTS if b['id'] == alloc['bot_id']), None)
                 if bot:
                     investors.append({'type': bot['type'], 'amount': amount})
+    
     ended = proj.get('current_phase', 0) >= proj['max_phase']
-    final_score_value = 0
-    if ended:
-        final_score_value = final_score(proj, proj['max_phase'], metrics)
+    final_score_value = final_score(proj, proj['max_phase']) if ended else 0
+    
     return jsonify({
         'status': room['status'],
         'phase': room['phase'],
-        'last_scenario': proj.get('last_scenario', 'Chưa có sự kiện'),
+        'max_phase': room['max_phase'],
+        'last_scenario': proj.get('last_scenario', 'Chờ sự kiện...'),
         'metrics': metrics,
         'hype': proj['hype'],
         'transparency': proj['transparency'],
         'hand': proj.get('current_hand', []),
         'energy_left': proj.get('energy_left', 3),
-        'mulligan_used': room['mulligan_used'][player_index],
         'investors': investors,
         'funding_progress': proj['funding_progress'],
         'available_cash': metrics['available_cash'],
-        'reaction_hand': proj.get('reaction_hand', []),
         'game_ended': room.get('game_ended', False),
         'ended': ended,
-        'final_score': final_score_value
+        'final_score': final_score_value,
+        'player_ready': room['player_ready'][player_index]
     })
 
 @app.route('/api/play_card', methods=['POST'])
@@ -458,42 +384,29 @@ def play_card():
     room_id = data['room_id']
     player_index = data['player_index']
     card_index = data['card_index']
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
+    
     if room['status'] != 'playing':
         return jsonify({'error': 'Game not in playing'}), 400
+    
     proj = room['players'][player_index]
+    
     if card_index >= len(proj['current_hand']):
         return jsonify({'error': 'Invalid card'}), 400
+    
     card = proj['current_hand'][card_index]
     cost = card['cost']
+    
     if proj['energy_left'] < cost:
-        return jsonify({'error': 'Not enough energy'}), 400
+        return jsonify({'error': f'Không đủ năng lượng! Cần {cost} năng lượng'}), 400
+    
     room['pending_cards'][player_index] = card
     proj['energy_left'] -= cost
-    return jsonify({'ok': True})
-
-@app.route('/api/mulligan', methods=['POST'])
-def mulligan():
-    data = request.json
-    room_id = data['room_id']
-    player_index = data['player_index']
-    if room_id not in rooms:
-        return jsonify({'error': 'Room not found'}), 404
-    room = rooms[room_id]
-    if room['status'] != 'playing':
-        return jsonify({'error': 'Not in game'}), 400
-    proj = room['players'][player_index]
-    if room['mulligan_used'][player_index]:
-        return jsonify({'error': 'Already used'}), 400
-    if proj['energy_left'] < 1:
-        return jsonify({'error': 'Not enough energy'}), 400
-    deck = proj['active_deck']
-    proj['current_hand'] = random.sample(deck, min(3, len(deck)))
-    proj['energy_left'] -= 1
-    proj['transparency'] = max(0, proj['transparency'] - 2)
-    room['mulligan_used'][player_index] = True
+    
     return jsonify({'ok': True})
 
 @app.route('/api/player_ready_phase', methods=['POST'])
@@ -501,197 +414,149 @@ def player_ready_phase():
     data = request.json
     room_id = data['room_id']
     player_index = data['player_index']
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
+    
     if room['status'] != 'playing':
         return jsonify({'error': 'Not playing'}), 400
+    
     room['player_ready'][player_index] = True
-    return jsonify({'ok': True})
-
-@app.route('/api/use_reaction', methods=['POST'])
-def use_reaction():
-    data = request.json
-    room_id = data['room_id']
-    player_index = data['player_index']
-    reaction_id = data['reaction_id']
-    if room_id not in rooms:
-        return jsonify({'error': 'Room not found'}), 404
-    room = rooms[room_id]
-    if room['status'] != 'playing':
-        return jsonify({'error': 'Not playing'}), 400
-    proj = room['players'][player_index]
-    reaction_index = None
-    for i, rc in enumerate(proj.get('reaction_hand', [])):
-        if rc['id'] == reaction_id:
-            reaction_index = i
-            break
-    if reaction_index is None:
-        return jsonify({'error': 'Invalid reaction'}), 400
-    rc = proj['reaction_hand'][reaction_index]
-    eff = rc['effect']
-    if 'transparency' in eff: proj['transparency'] += eff['transparency']
-    if 'hype' in eff: proj['hype'] += eff['hype']
-    if 'runway' in eff:
-        m = calculate_metrics(proj)
-        proj['available_cash'] += eff['runway'] * m['monthly_burn']
-    if 'reg_risk' in eff: 
-        if 'reg_risk' not in proj: proj['reg_risk'] = 50
-        proj['reg_risk'] = max(0, proj['reg_risk']+eff['reg_risk'])
-    if 'security' in eff:
-        if 'security' not in proj: proj['security'] = 50
-        proj['security'] = max(0, proj['security']+eff['security'])
-    if 'trust_all' in eff:
-        for bid in proj['trust_scores']: proj['trust_scores'][bid] = min(100, max(0, proj['trust_scores'][bid] + eff['trust_all']))
-    proj['available_cash'] -= (rc['cost_percent']/100) * proj['target_funding']
-    proj['reaction_hand'].pop(reaction_index)
+    
     return jsonify({'ok': True})
 
 @app.route('/api/run_phase', methods=['POST'])
 def run_phase():
     data = request.json
     room_id = data['room_id']
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
+    
     room = rooms[room_id]
+    
     if room['status'] != 'playing':
         return jsonify({'error': 'Game not active'}), 400
+    
     if not all(room['player_ready']):
         return jsonify({'error': 'Not all players ready'}), 400
+    
     phase = room['phase']
     players = room['players']
     logs = []
+    
+    # XỬ LÝ TỪNG DỰ ÁN
     for idx, proj in enumerate(players):
-        if proj.get('current_phase', 0) >= proj['max_phase']:
+        if not proj or proj.get('current_phase', 0) >= proj['max_phase']:
             continue
+        
+        # 1. Random sự kiện
         scenario = random.choice(SCENARIOS)
         proj['last_scenario'] = scenario['name']
-        logs.append(f"Dự án {idx+1}: {scenario['name']}")
-        d = scenario['delta']
-        if 'price' in d: proj['price'] *= (1 + d['price'])
-        if 'cogs' in d:
-            proj['material'] *= (1 + d['cogs'])
-            proj['packaging'] *= (1 + d['cogs'])
-            proj['shipping'] *= (1 + d['cogs'])
-        proj['hype'] = max(0, proj['hype'] + d.get('hype', 0))
-        proj['transparency'] = max(0, min(100, proj['transparency'] + d.get('transparency', 0)))
-        if 'trust_all' in d:
-            for bid in proj['trust_scores']: proj['trust_scores'][bid] = max(0, min(100, proj['trust_scores'][bid] + d['trust_all']))
-        if 'runway' in d:
-            metrics_before = calculate_metrics(proj)
-            proj['available_cash'] += d['runway'] * metrics_before['monthly_burn']
-        if 'legal_cost_percent' in d:
-            cost = (d['legal_cost_percent']/100) * proj['target_funding']
-            proj['legal_cost_spent'] = proj.get('legal_cost_spent', 0) + cost
-            proj['available_cash'] -= cost
+        logs.append(f"📢 Dự án {idx+1}: {scenario['name']}")
+        
+        delta = scenario['delta']
+        if 'price' in delta:
+            proj['price'] *= (1 + delta['price'])
+        if 'hype' in delta:
+            proj['hype'] = clamp(proj['hype'] + delta['hype'], 0, 100)
+        if 'transparency' in delta:
+            proj['transparency'] = clamp(proj['transparency'] + delta['transparency'], 0, 100)
+        
+        # 2. Áp dụng thẻ đã chọn trong phase
         if idx in room['pending_cards']:
             card = room['pending_cards'][idx]
             if card:
                 eff = card['effect']
-                if 'hype' in eff: proj['hype'] = max(0, proj['hype'] + eff['hype'])
-                if 'transparency' in eff: proj['transparency'] = max(0, min(100, proj['transparency'] + eff['transparency']))
-                if 'price_percent' in eff: proj['price'] *= (1 + eff['price_percent']/100)
-                if 'cogs_percent' in eff:
-                    proj['material'] *= (1 + eff['cogs_percent']/100)
-                    proj['packaging'] *= (1 + eff['cogs_percent']/100)
-                    proj['shipping'] *= (1 + eff['cogs_percent']/100)
-                if 'funding_boost_percent' in eff:
-                    boost = eff['funding_boost_percent']/100 * proj['target_funding']
-                    proj['total_invested'] += boost
-                    proj['available_cash'] += boost
-                    proj['funding_progress'] = min(1.0, proj['total_invested']/proj['target_funding'])
-                if 'cost_percent' in eff:
-                    proj['available_cash'] -= (eff['cost_percent']/100) * proj['target_funding']
-                logs.append(f"  → Dự án {idx+1} chơi thẻ {card['name']}")
+                if 'hype' in eff:
+                    proj['hype'] = clamp(proj['hype'] + eff['hype'], 0, 100)
+                if 'transparency' in eff:
+                    proj['transparency'] = clamp(proj['transparency'] + eff['transparency'], 0, 100)
+                if 'price_percent' in eff:
+                    proj['price'] *= (1 + eff['price_percent']/100)
+                if 'funding_boost' in eff:
+                    boost = eff['funding_boost'] * proj['target_funding']
+                    proj['total_invested'] = proj.get('total_invested', 0) + boost
+                    proj['available_cash'] = proj.get('available_cash', 0) + boost
+                    proj['funding_progress'] = min(1.0, proj['total_invested'] / proj['target_funding'])
+                if 'cost' in eff:
+                    proj['available_cash'] -= eff['cost']
+                logs.append(f"  🃏 Dự án {idx+1} đánh bài: {card['name']}")
+        
+        # 3. Cập nhật metrics và phase
         metrics = calculate_metrics(proj)
         proj['funding_progress'] = metrics['funding_progress']
         proj['current_phase'] = proj.get('current_phase', 0) + 1
+        
+        logs.append(f"  📊 Funding: {(proj['funding_progress']*100):.1f}% | Hype: {proj['hype']} | Trans: {proj['transparency']}")
+        
         if proj['current_phase'] >= proj['max_phase']:
-            proj['status'] = 'ended'
-            logs.append(f"  → Dự án {idx+1} kết thúc (đã qua {proj['max_phase']} phases).")
-        logs.append(f"  → Funding sau phase: {proj['funding_progress']*100:.1f}%")
-    bot_alloc = room['bot_alloc']
-    A = {}
-    for bot in BOTS:
-        for idx, proj in enumerate(players):
-            if not proj or proj.get('status') != 'active' or proj['funding_progress'] >= 1 or proj.get('current_phase',0) >= proj['max_phase']:
-                A[(bot['id'], idx)] = -1e9
-            else:
-                metrics = calculate_metrics(proj)
-                A[(bot['id'], idx)] = attractiveness(proj, bot, metrics)
-    for bot in BOTS:
-        best_idx = max(range(len(players)), key=lambda i: A[(bot['id'], i)])
-        alloc_entry = next(entry for entry in bot_alloc if entry['bot_id'] == bot['id'])
-        for idx in range(len(players)):
-            invested = alloc_entry['perProject'][idx]
-            if invested == 0: continue
-            if players[idx].get('status') != 'active' or players[idx].get('current_phase',0) >= players[idx]['max_phase']:
+            logs.append(f"  🏁 Dự án {idx+1} KẾT THÚC!")
+    
+    # XỬ LÝ BOT ĐẦU TƯ
+    if room['bot_alloc']:
+        bot_alloc = room['bot_alloc']
+        
+        # Tính attractiveness cho mỗi bot với mỗi dự án
+        A = {}
+        for bot in BOTS:
+            for idx, proj in enumerate(players):
+                if not proj or proj.get('current_phase', 0) >= proj['max_phase'] or proj['funding_progress'] >= 1:
+                    A[(bot['id'], idx)] = -1e9
+                else:
+                    metrics = calculate_metrics(proj)
+                    A[(bot['id'], idx)] = attractiveness(proj, bot, metrics)
+        
+        # BOT ĐẦU TƯ MỚI
+        for bot_idx, bot in enumerate(BOTS):
+            alloc_entry = bot_alloc[bot_idx]
+            idle = alloc_entry['idle']
+            if idle <= 0:
                 continue
-            diff = A[(bot['id'], best_idx)] - A[(bot['id'], idx)]
-            if diff > 15: withdraw_ratio = 1.0
-            elif diff > 5: withdraw_ratio = 0.3
-            else: withdraw_ratio = 0.0
-            if withdraw_ratio > 0:
-                desired = invested * withdraw_ratio
-                max_ratio = min(0.6, 0.2 + (phase-1)*0.05)
-                max_withdraw = invested * max_ratio
-                if desired > max_withdraw:
-                    extra = desired - max_withdraw
-                    actual = max_withdraw + extra*0.5
-                else:
-                    actual = desired
-                if actual <= players[idx]['available_cash']:
-                    players[idx]['available_cash'] -= actual
-                    alloc_entry['perProject'][idx] -= actual
-                    alloc_entry['idle'] += actual
-                    logs.append(f"🐋 Bot {bot['type']} rút {actual:.0f} từ dự án {idx+1}")
-                else:
-                    players[idx]['status'] = 'bankrupt'
-                    players[idx]['funding_progress'] = 0
-                    logs.append(f"💀 Dự án {idx+1} PHÁ SẢN!")
-    for bot in BOTS:
-        alloc_entry = next(entry for entry in bot_alloc if entry['bot_id'] == bot['id'])
-        idle = alloc_entry['idle']
-        if idle <= 0: continue
-        candidates = [i for i,p in enumerate(players) if p and p['status']=='active' and p['funding_progress']<1 and p.get('current_phase',0) < p['max_phase']]
-        if not candidates: continue
-        attrs = [A[(bot['id'], i)] for i in candidates]
-        min_a = min(attrs)
-        shifted = [max(0, a-min_a+0.01) for a in attrs]
-        sum_exp = sum(math.exp(a/20) for a in shifted)
-        probs = [math.exp(a/20)/sum_exp for a in shifted]
-        remaining = idle
-        for _ in range(5):
-            if remaining <= 0: break
-            for j, idx in enumerate(candidates):
-                invest = remaining * probs[j]
-                cap = min(invest, players[idx]['target_funding']*0.25 - players[idx]['total_invested'])
-                if phase == 1:
-                    cap = min(cap, players[idx]['target_funding']*0.2 - players[idx]['total_invested'])
-                if cap > 0:
-                    players[idx]['total_invested'] += cap
-                    players[idx]['available_cash'] += cap
-                    players[idx]['funding_progress'] = min(1.0, players[idx]['total_invested']/players[idx]['target_funding'])
-                    alloc_entry['perProject'][idx] += cap
-                    remaining -= cap
-                    logs.append(f"💸 Bot {bot['type']} đầu tư {cap:.0f} vào dự án {idx+1}")
-        alloc_entry['idle'] = remaining
+            
+            # Tìm dự án tốt nhất để đầu tư
+            candidates = [i for i, p in enumerate(players) if p and p.get('current_phase', 0) < p['max_phase'] and p['funding_progress'] < 1]
+            if not candidates:
+                continue
+            
+            best_idx = max(candidates, key=lambda i: A[(bot['id'], i)])
+            best_score = A[(bot['id'], best_idx)]
+            
+            # Đầu tư vào dự án tốt nhất
+            invest_amount = min(idle * 0.1, players[best_idx]['target_funding'] * 0.1)
+            if invest_amount > 0 and players[best_idx]['funding_progress'] < 1:
+                players[best_idx]['total_invested'] = players[best_idx].get('total_invested', 0) + invest_amount
+                players[best_idx]['available_cash'] = players[best_idx].get('available_cash', 0) + invest_amount
+                players[best_idx]['funding_progress'] = min(1.0, players[best_idx]['total_invested'] / players[best_idx]['target_funding'])
+                alloc_entry['perProject'][best_idx] += invest_amount
+                alloc_entry['idle'] -= invest_amount
+                logs.append(f"💰 Bot {bot['type']} đầu tư ${invest_amount:,.0f} vào dự án {best_idx+1}")
+    
+    # RESET CHO PHASE TIẾP THEO
     room['pending_cards'] = {}
     room['player_ready'] = [False] * room['num_players']
     room['phase'] += 1
-    room['logs'] = logs
-    all_ended = all(p is None or p.get('current_phase',0) >= p['max_phase'] for p in players)
+    room['logs'] = logs + room.get('logs', [])[-20:]  # Giữ 20 log gần nhất
+    
+    # Phát bài mới cho phase tiếp theo
+    if room['phase'] <= room['max_phase']:
+        for idx, proj in enumerate(players):
+            if proj and proj.get('current_phase', 0) < proj['max_phase'] and proj['funding_progress'] < 1:
+                proj['current_hand'] = random.sample(proj['active_deck'], min(5, len(proj['active_deck'])))
+                proj['energy_left'] = 3
+                room['mulligan_used'][idx] = False
+    
+    # Kiểm tra game kết thúc
+    all_ended = all(p is None or p.get('current_phase', 0) >= p['max_phase'] for p in players)
     game_ended = (room['phase'] > room['max_phase']) or all_ended
+    
     if game_ended:
         room['game_ended'] = True
         room['status'] = 'ended'
-    if not game_ended:
-        for idx, proj in enumerate(players):
-            if proj and proj['status'] == 'active' and proj['funding_progress'] < 1 and proj.get('current_phase',0) < proj['max_phase']:
-                deck = proj['active_deck']
-                proj['current_hand'] = random.sample(deck, min(5, len(deck)))
-                proj['energy_left'] = 3
-                room['mulligan_used'][idx] = False
+        room['logs'].append("🏆 GAME KẾT THÚC! 🏆")
+    
     return jsonify({
         'ended': game_ended,
         'phase': room['phase'],
@@ -699,27 +564,5 @@ def run_phase():
         'game_ended': game_ended
     })
 
-@app.route('/api/card_lists', methods=['GET'])
-def card_lists():
-    return jsonify({
-        'active': ALL_ACTIVE_CARDS,
-        'reaction': REACTION_CARDS
-    })
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-@app.route('/api/debug_room', methods=['GET'])
-def debug_room():
-    room_id = request.args.get('room_id')
-    if room_id not in rooms:
-        return jsonify({'error': 'Room not found'}), 404
-    room = rooms[room_id]
-    return jsonify({
-        'status': room['status'],
-        'phase': room['phase'],
-        'player_ready': room['player_ready'],
-        'all_players': [p is not None for p in room['players']],
-        'all_decks_selected': all(room['player_ready']),
-        'max_phase': room['max_phase'],
-        'game_ended': room.get('game_ended', False)
-    })
