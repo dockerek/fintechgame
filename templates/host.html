@@ -4,49 +4,71 @@
     <meta charset="UTF-8">
     <title>Host Startup Game</title>
     <style>
-        * { box-sizing: border-box; font-family: system-ui; }
-        body { background: #0b1120; color: #eef2ff; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; }
-        .panel { background: #1e293b; border-radius: 24px; padding: 20px; margin-bottom: 20px; }
-        button { background: #ec4899; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .rankings { display: grid; gap: 10px; margin-top: 15px; }
-        .rank-card { background: #0f172a; border-radius: 16px; padding: 15px; border-left: 4px solid #ec4899; }
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: #0b1120; color: #eef2ff; padding: 20px; margin: 0; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .panel { background: #1e293b; border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        button { background: #ec4899; border: none; padding: 10px 24px; border-radius: 30px; font-weight: bold; cursor: pointer; color: white; font-size: 16px; transition: transform 0.1s, opacity 0.1s; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        button:active { transform: scale(0.98); }
+        .flex { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .rankings { display: grid; gap: 12px; margin-top: 16px; }
+        .rank-card { background: #0f172a; border-radius: 16px; padding: 16px; border-left: 4px solid #ec4899; transition: all 0.2s; }
         .rank-card h3 { margin: 0 0 8px 0; color: #fbcfe8; }
-        .logs { background: #00000066; border-radius: 16px; padding: 12px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; margin-top: 15px; }
-        .link-item { background: #0f172a; padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; word-break: break-all; }
+        .rank-card.ended { opacity: 0.6; border-left-color: #6b7280; }
+        .logs { background: #00000066; border-radius: 16px; padding: 12px; max-height: 350px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; margin-top: 16px; }
+        .logs div { padding: 4px 0; border-bottom: 1px solid #334155; font-family: monospace; }
+        .link-item { background: #0f172a; padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; word-break: break-all; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
         .link-item a { color: #ec4899; text-decoration: none; }
         .link-item a:hover { text-decoration: underline; }
-        .status-ended { opacity: 0.6; border-left-color: #6b7280; }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; background: #334155; }
-        .status-playing { background: #22c55e; color: #0f172a; }
-        .status-waiting { background: #f59e0b; color: #0f172a; }
+        .link-item button { padding: 6px 12px; font-size: 12px; background: #334155; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-waiting { background: #f59e0b; color: #1e293b; }
+        .status-choosing { background: #8b5cf6; color: #1e293b; }
+        .status-playing { background: #22c55e; color: #1e293b; }
+        .status-ended { background: #6b7280; color: white; }
+        input, select { background: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 12px; color: white; font-size: 14px; }
+        input:focus, select:focus { outline: none; border-color: #ec4899; }
+        h2, h3 { margin-top: 0; }
+        .room-info { background: #0f172a; padding: 16px; border-radius: 16px; margin-bottom: 16px; }
+        .run-btn { background: #22c55e; font-size: 18px; padding: 12px 32px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        .waiting-text { color: #f59e0b; padding: 10px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="setupPanel" class="panel">
         <h2>🎮 TẠO PHÒNG CHƠI</h2>
-        <label>Số người chơi (2-10):</label>
-        <input type="number" id="numPlayers" min="2" max="10" value="4">
-        <button id="createRoomBtn">Tạo phòng</button>
+        <div class="flex">
+            <label>Số người chơi (2-10):</label>
+            <input type="number" id="numPlayers" min="2" max="10" value="4" style="width: 80px;">
+            <button id="createRoomBtn">🚀 Tạo phòng</button>
+        </div>
     </div>
 
     <div id="gamePanel" style="display:none;" class="panel">
-        <h2>🏠 PHÒNG: <span id="roomId"></span></h2>
-        <p><span class="status-badge" id="statusBadge">Đang chờ</span></p>
-        <p><strong>🔗 Link mời người chơi:</strong></p>
-        <div id="joinLinksList" style="background: #0f172a; border-radius: 16px; padding: 12px; margin-bottom: 16px;">
+        <div class="room-info">
+            <h2>🏠 PHÒNG: <span id="roomId" style="color: #ec4899;"></span></h2>
+            <div class="flex" style="justify-content: space-between;">
+                <p>👥 <span id="playerCount"></span> / <span id="maxPlayers"></span> đã tham gia</p>
+                <p><span class="status-badge" id="statusBadge">⏳ Đang chờ</span></p>
+            </div>
         </div>
-        <p>👥 Trạng thái: <span id="playerCount"></span> / <span id="maxPlayers"></span> đã tham gia</p>
-       
+        
+        <h3>🔗 LINK MỜI NGƯỜI CHƠI:</h3>
+        <div id="joinLinksList" style="background: #0f172a; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
+        </div>
+        
         <h3>🏆 BẢNG XẾP HẠNG</h3>
         <div id="rankings" class="rankings">Đang tải...</div>
-       
+        
+        <h3>📜 NHẬT KÝ TRÒ CHƠI</h3>
         <div id="logsArea" class="logs"></div>
-        <div id="phaseControl">
-            <button id="runPhaseBtn" style="display:none; background:#22c55e; font-size:16px;">▶ CHẠY PHASE TIẾP THEO</button>
-            <div id="waitingMsg" style="display:none; color: #f59e0b; padding: 10px;">⏳ Đợi người chơi sẵn sàng...</div>
+        
+        <div id="phaseControl" style="margin-top: 20px; text-align: center;">
+            <button id="runPhaseBtn" style="display:none;" class="run-btn">▶ CHẠY PHASE TIẾP THEO</button>
+            <div id="waitingMsg" style="display:none;" class="waiting-text">⏳ Đợi người chơi sẵn sàng...</div>
         </div>
     </div>
 </div>
@@ -64,23 +86,24 @@
         });
         let data = await res.json();
         roomId = data.room_id;
-       
+        
         let linksHtml = '';
         data.join_links.forEach((link, idx) => {
             linksHtml += `<div class="link-item">
-                            🎮 Người chơi ${idx+1}: <a href="${link}" target="_blank">${link}</a>
-                            <button class="copy-link-btn" data-link="${link}" style="margin-left: 10px; padding: 2px 8px; font-size: 0.7rem;">Sao chép</button>
+                            <span>🎮 Player ${idx+1}:</span>
+                            <a href="${link}" target="_blank">${link}</a>
+                            <button class="copy-link-btn" data-link="${link}">📋 Sao chép</button>
                           </div>`;
         });
         document.getElementById('joinLinksList').innerHTML = linksHtml;
-       
+        
         document.querySelectorAll('.copy-link-btn').forEach(btn => {
             btn.onclick = () => {
                 const link = btn.getAttribute('data-link');
-                navigator.clipboard.writeText(link).then(() => alert('Đã sao chép link'));
+                navigator.clipboard.writeText(link).then(() => alert('✅ Đã sao chép link!'));
             };
         });
-       
+        
         document.getElementById('roomId').innerText = roomId;
         document.getElementById('maxPlayers').innerText = num;
         document.getElementById('setupPanel').style.display = 'none';
@@ -92,53 +115,61 @@
         if (interval) clearInterval(interval);
         interval = setInterval(async () => {
             try {
-                let state = await fetch(`/api/host_state?room_id=${roomId}`).then(r=>r.json());
+                let res = await fetch(`/api/host_state?room_id=${roomId}`);
+                let state = await res.json();
                 
                 document.getElementById('playerCount').innerText = state.players_joined;
                 
                 // Cập nhật status badge
-                let badge = document.getElementById('statusBadge');
+                let statusBadge = document.getElementById('statusBadge');
                 if (state.status === 'waiting') {
-                    badge.innerHTML = '⏳ Đang chờ người chơi';
-                    badge.className = 'status-badge status-waiting';
+                    statusBadge.innerHTML = '⏳ Đang chờ người chơi';
+                    statusBadge.className = 'status-badge status-waiting';
                 } else if (state.status === 'choosing_deck') {
-                    badge.innerHTML = '🎴 Đang chọn bài';
-                    badge.className = 'status-badge status-waiting';
+                    statusBadge.innerHTML = '🎴 Đang chọn bài...';
+                    statusBadge.className = 'status-badge status-choosing';
                 } else if (state.status === 'playing') {
-                    badge.innerHTML = `🎮 Đang chơi - Phase ${state.phase}/${state.max_phase}`;
-                    badge.className = 'status-badge status-playing';
+                    statusBadge.innerHTML = `🎮 ĐANG CHƠI - Phase ${state.phase}/${state.max_phase}`;
+                    statusBadge.className = 'status-badge status-playing';
                 } else if (state.status === 'ended') {
-                    badge.innerHTML = '🏆 KẾT THÚC';
-                    badge.className = 'status-badge';
+                    statusBadge.innerHTML = '🏆 KẾT THÚC';
+                    statusBadge.className = 'status-badge status-ended';
                 }
                 
+                // Cập nhật rankings
                 if (state.rankings) {
                     let html = '';
-                    state.rankings.forEach(p => {
-                        const endedClass = p.status === 'ended' ? 'status-ended' : '';
+                    state.rankings.forEach((p) => {
+                        let endedClass = p.status === 'ended' ? 'ended' : '';
+                        let fundingPercent = (p.funding * 100).toFixed(1);
                         html += `<div class="rank-card ${endedClass}">
-                            <h3>${p.name}</h3>
-                            <div>💰 Funding: ${(p.funding * 100).toFixed(1)}%</div>
-                            <div>📊 Hype: ${p.hype || 50} | Transparency: ${p.transparency || 50}</div>
+                            <h3>👤 ${p.name}</h3>
+                            <div>💰 Funding: ${fundingPercent}%</div>
+                            <div>📊 Hype: ${p.hype || 50} | 🔍 Transparency: ${p.transparency || 50}</div>
                             <div>🏅 Điểm: ${p.score?.toFixed(2) || '0.00'}</div>
-                            <div>📏 Scale: ${p.scale || '?'}</div>
-                            ${p.status === 'ended' ? '<div>✅ Đã kết thúc</div>' : ''}
+                            ${p.status === 'ended' ? '<div>✅ Đã hoàn thành</div>' : ''}
                             ${p.status === 'not_joined' ? '<div>⏳ Chưa tham gia</div>' : ''}
                         </div>`;
                     });
                     document.getElementById('rankings').innerHTML = html;
                 }
                 
-                if (state.logs) {
-                    let logsHtml = state.logs.slice().reverse().map(l=>`<div>${l}</div>`).join('');
+                // Cập nhật logs (hiển thị mới nhất ở trên)
+                if (state.logs && state.logs.length) {
+                    let logsHtml = [...state.logs].reverse().map(l => `<div>${l}</div>`).join('');
                     document.getElementById('logsArea').innerHTML = logsHtml;
                 }
                 
-                // QUAN TRỌNG: Xử lý hiển thị nút Run Phase
+                // XỬ LÝ NÚT RUN PHASE - QUAN TRỌNG NHẤT
                 let runBtn = document.getElementById('runPhaseBtn');
                 let waitingMsg = document.getElementById('waitingMsg');
                 
-                console.log("State:", state.status, "all_ready:", state.all_ready, "game_ended:", state.game_ended);
+                console.log('🔍 Debug:', {
+                    status: state.status,
+                    all_ready: state.all_ready,
+                    game_ended: state.game_ended,
+                    phase: state.phase
+                });
                 
                 if (state.status === 'playing' && !state.game_ended) {
                     if (state.all_ready === true) {
@@ -157,7 +188,7 @@
                 
                 if (state.game_ended) {
                     clearInterval(interval);
-                    alert('🏆 TRÒ CHƠI KẾT THÚC! 🏆');
+                    alert('🏆 TRÒ CHƠI KẾT THÚC! 🏆\nXem bảng xếp hạng để biết kết quả.');
                 }
             } catch (err) {
                 console.error('Polling error:', err);
@@ -166,17 +197,21 @@
     }
 
     document.getElementById('runPhaseBtn').onclick = async () => {
-        let res = await fetch('/api/run_phase', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({room_id: roomId})
-        });
-        let data = await res.json();
-        if (data.ended || data.game_ended) {
-            alert('🏆 GAME KẾT THÚC! 🏆');
-            clearInterval(interval);
-        } else {
+        try {
+            let res = await fetch('/api/run_phase', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({room_id: roomId})
+            });
+            let data = await res.json();
+            if (data.ended || data.game_ended) {
+                alert('🏆 GAME KẾT THÚC! 🏆');
+                clearInterval(interval);
+            }
             document.getElementById('runPhaseBtn').style.display = 'none';
+        } catch (err) {
+            console.error('Run phase error:', err);
+            alert('Lỗi: ' + err.message);
         }
     };
 </script>
