@@ -310,37 +310,57 @@ def submit_deck():
     player_index = data['player_index']
     active_indices = data['active_indices']
     reaction_indices = data['reaction_indices']
+    
     if room_id not in rooms:
         return jsonify({'error': 'Room not found'}), 404
     room = rooms[room_id]
+    
     if len(active_indices) != 22:
         return jsonify({'error': 'Phải chọn đúng 22 active cards'}), 400
     if len(reaction_indices) > 3:
         return jsonify({'error': 'Tối đa 3 reaction cards'}), 400
+    
     proj = room['players'][player_index]
     proj['active_deck'] = [ALL_ACTIVE_CARDS[i] for i in active_indices]
     proj['reaction_hand'] = [REACTION_CARDS[i] for i in reaction_indices]
+    
     room['player_ready'][player_index] = True
+    
+    # KIỂM TRA TẤT CẢ ĐÃ CHỌN DECK CHƯA
+    print(f"Debug: Player {player_index} ready. All ready: {room['player_ready']}")
+    
     if all(room['player_ready']):
-        max_phase = max(p['max_phase'] for p in room['players'])
+        print("Debug: All players ready, initializing game...")
+        # Tất cả đã chọn deck -> khởi tạo game
+        max_phase = max(p['max_phase'] for p in room['players'] if p is not None)
         room['max_phase'] = max_phase
+        
         bot_alloc = []
         for bot in BOTS:
             per = [0] * room['num_players']
             bot_alloc.append({'bot_id': bot['id'], 'perProject': per, 'idle': bot['wealth']})
         room['bot_alloc'] = bot_alloc
-        room['phase'] = 1
-        room['status'] = 'playing'
-        room['player_ready'] = [False] * room['num_players']
+        
+        room['phase'] = 1  # BẮT ĐẦU TỪ PHASE 1
+        room['status'] = 'playing'  # CHUYỂN SANG TRẠNG THÁI PLAYING
+        room['player_ready'] = [False] * room['num_players']  # RESET READY CHO PHASE ĐẦU
         room['pending_cards'] = {}
         room['phase_energy'] = [3] * room['num_players']
         room['mulligan_used'] = [False] * room['num_players']
+        
+        # Tạo bài ban đầu cho mỗi player
         for idx, proj in enumerate(room['players']):
             if proj:
                 deck = proj['active_deck']
                 proj['current_hand'] = random.sample(deck, min(5, len(deck)))
                 proj['energy_left'] = 3
-    return jsonify({'ok': True})
+                proj['current_phase'] = 0  # ĐẢM BẢO BẮT ĐẦU TỪ PHASE 0
+                print(f"Debug: Player {idx} initial hand: {len(proj['current_hand'])} cards")
+        
+        print(f"Debug: Game initialized. Status: {room['status']}, Phase: {room['phase']}")
+        return jsonify({'ok': True, 'game_started': True})
+    
+    return jsonify({'ok': True, 'game_started': False})
 
 @app.route('/api/host_state', methods=['GET'])
 def host_state():
@@ -688,3 +708,18 @@ def card_lists():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+@app.route('/api/debug_room', methods=['GET'])
+def debug_room():
+    room_id = request.args.get('room_id')
+    if room_id not in rooms:
+        return jsonify({'error': 'Room not found'}), 404
+    room = rooms[room_id]
+    return jsonify({
+        'status': room['status'],
+        'phase': room['phase'],
+        'player_ready': room['player_ready'],
+        'all_players': [p is not None for p in room['players']],
+        'all_decks_selected': all(room['player_ready']),
+        'max_phase': room['max_phase'],
+        'game_ended': room.get('game_ended', False)
+    })
