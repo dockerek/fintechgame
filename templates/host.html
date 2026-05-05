@@ -47,3 +47,161 @@
     <div id="gamePanel" style="display:none;" class="panel">
         <div class="room-info">
             <h2>🏠 PHÒNG: <span id="roomId" style="color: #ec4899;"></span></h2>
+            <p>👥 Trạng thái: <span id="playerCount"></span> / <span id="maxPlayers"></span> đã tham gia</p>
+            <div class="status-badge" id="gameStatus">Đang chờ</div>
+        </div>
+        
+        <h3>🔗 LINK MỜI NGƯỜI CHƠI:</h3>
+        <div id="joinLinksList" style="background: #0f172a; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
+        </div>
+        
+        <h3>🏆 BẢNG XẾP HẠNG</h3>
+        <div id="rankings" class="rankings">Đang tải...</div>
+        
+        <h3>📜 NHẬT KÝ TRÒ CHƠI</h3>
+        <div id="logsArea" class="logs"></div>
+        
+        <div id="phaseControl" style="margin-top: 20px; text-align: center;">
+            <button id="runPhaseBtn" style="display:none; background: #22c55e; font-size: 18px; padding: 12px 32px;">▶ CHẠY PHASE TIẾP THEO</button>
+            <div id="waitingMsg" style="display:none; color: #f59e0b; padding: 10px;">⏳ Đợi người chơi sẵn sàng...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let roomId = null;
+    let interval = null;
+
+    document.getElementById('createRoomBtn').onclick = async () => {
+        let num = parseInt(document.getElementById('numPlayers').value);
+        let res = await fetch('/api/create_room', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({num_players: num})
+        });
+        let data = await res.json();
+        roomId = data.room_id;
+        
+        let linksHtml = '';
+        data.join_links.forEach((link, idx) => {
+            linksHtml += `<div class="link-item">
+                            <span>🎮 Player ${idx+1}:</span>
+                            <a href="${link}" target="_blank">${link}</a>
+                            <button class="copy-link-btn" data-link="${link}">📋 Sao chép</button>
+                          </div>`;
+        });
+        document.getElementById('joinLinksList').innerHTML = linksHtml;
+        
+        document.querySelectorAll('.copy-link-btn').forEach(btn => {
+            btn.onclick = () => {
+                const link = btn.getAttribute('data-link');
+                navigator.clipboard.writeText(link).then(() => alert('✅ Đã sao chép link!'));
+            };
+        });
+        
+        document.getElementById('roomId').innerText = roomId;
+        document.getElementById('maxPlayers').innerText = num;
+        document.getElementById('setupPanel').style.display = 'none';
+        document.getElementById('gamePanel').style.display = 'block';
+        startPolling();
+    };
+
+    async function startPolling() {
+        if (interval) clearInterval(interval);
+        interval = setInterval(async () => {
+            try {
+                let res = await fetch(`/api/host_state?room_id=${roomId}`);
+                let state = await res.json();
+                
+                document.getElementById('playerCount').innerText = state.players_joined;
+                
+                // Cập nhật status badge
+                let statusBadge = document.getElementById('gameStatus');
+                if (state.status === 'waiting') {
+                    statusBadge.innerHTML = '⏳ Đang chờ người chơi';
+                    statusBadge.className = 'status-badge status-waiting';
+                } else if (state.status === 'choosing_deck') {
+                    statusBadge.innerHTML = '🎴 Đang chọn bài';
+                    statusBadge.className = 'status-badge status-waiting';
+                } else if (state.status === 'playing') {
+                    statusBadge.innerHTML = `🎮 Đang chơi - Phase ${state.phase}/${state.max_phase}`;
+                    statusBadge.className = 'status-badge status-playing';
+                } else if (state.status === 'ended') {
+                    statusBadge.innerHTML = '🏆 KẾT THÚC';
+                    statusBadge.className = 'status-badge status-ended';
+                }
+                
+                // Cập nhật rankings
+                if (state.rankings) {
+                    let html = '';
+                    state.rankings.forEach((p, idx) => {
+                        let endedClass = p.status === 'ended' ? 'status-ended' : '';
+                        let fundingPercent = (p.funding * 100).toFixed(1);
+                        html += `<div class="rank-card ${endedClass}">
+                            <h3>👤 Player ${idx+1}: ${p.name}</h3>
+                            <div>💰 Funding: ${fundingPercent}%</div>
+                            <div>📊 Hype: ${p.hype || 50} | Transparency: ${p.transparency || 50}</div>
+                            <div>🏅 Điểm: ${p.score?.toFixed(2) || '0.00'}</div>
+                            <div>📏 Scale: ${p.scale || 'M'}</div>
+                            ${p.status === 'ended' ? '<div>✅ Đã kết thúc</div>' : ''}
+                            ${p.status === 'not_joined' ? '<div>⏳ Chưa tham gia</div>' : ''}
+                        </div>`;
+                    });
+                    document.getElementById('rankings').innerHTML = html;
+                }
+                
+                // Cập nhật logs
+                if (state.logs && state.logs.length) {
+                    let logsHtml = state.logs.slice().reverse().map(l => `<div>${l}</div>`).join('');
+                    document.getElementById('logsArea').innerHTML = logsHtml;
+                }
+                
+                // Cập nhật nút Run Phase
+                let runBtn = document.getElementById('runPhaseBtn');
+                let waitingMsg = document.getElementById('waitingMsg');
+                
+                if (state.status === 'playing' && !state.game_ended) {
+                    if (state.all_ready) {
+                        runBtn.style.display = 'inline-block';
+                        waitingMsg.style.display = 'none';
+                        runBtn.innerText = `▶ CHẠY PHASE ${state.phase}`;
+                    } else {
+                        runBtn.style.display = 'none';
+                        waitingMsg.style.display = 'block';
+                        waitingMsg.innerText = `⏳ Đợi người chơi sẵn sàng... (Phase ${state.phase})`;
+                    }
+                } else {
+                    runBtn.style.display = 'none';
+                    waitingMsg.style.display = 'none';
+                }
+                
+                if (state.game_ended) {
+                    clearInterval(interval);
+                    alert('🏆 TRÒ CHƠI KẾT THÚC! 🏆\nXem bảng xếp hạng để biết kết quả.');
+                }
+            } catch (err) {
+                console.error('Polling error:', err);
+            }
+        }, 2000);
+    }
+
+    document.getElementById('runPhaseBtn').onclick = async () => {
+        try {
+            let res = await fetch('/api/run_phase', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({room_id: roomId})
+            });
+            let data = await res.json();
+            if (data.ended || data.game_ended) {
+                alert('🏆 GAME KẾT THÚC! 🏆');
+                clearInterval(interval);
+            }
+            document.getElementById('runPhaseBtn').style.display = 'none';
+        } catch (err) {
+            alert('Lỗi: ' + err.message);
+        }
+    };
+</script>
+</body>
+</html>
